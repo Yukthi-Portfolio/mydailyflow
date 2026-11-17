@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MyDailyFlow{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="page-header">
+        <div>
+            <h2>📊 Dashboard</h2>
+            <p class="date-display">{{ today.strftime('%A, %B %d, %Y') }}</p>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="card card-blue">
+            <div class="card-icon">📋</div>
+            <div class="card-content">
+                <h3>{{ pending_assignments|length }}</h3>
+                <p>Pending Tasks</p>
+            </div>
+        </div>
+
+        <div class="card card-orange">
+            <div class="card-icon">⚡</div>
+            <div class="card-content">
+                <h3>{{ assignments_due_today|length }}</h3>
+                <p>Due Today</p>
+            </div>
+        </div>
+
+        <div class="card card-green">
+            <div class="card-icon">🎯</div>
+            <div class="card-content">
+                <h3>{{ habits_completed_today }}/{{ total_habits }}</h3>
+                <p>Goals Completed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Task Completion Chart -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>📈 Task Completion Progress</h3>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="taskProgressChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Priority Distribution -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>🎯 Tasks by Priority</h3>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="priorityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-grid">
+        <!-- Due Today Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h3>🔥 Due Today</h3>
+                <a href="{{ url_for('add_assignment') }}" class="btn btn-small">+ Add</a>
+            </div>
+            <div class="section-content">
+                {% if assignments_due_today %}
+                    {% for assignment in assignments_due_today %}
+                        <div class="list-item">
+                            <div class="item-content">
+                                <span class="priority-badge priority-{{ assignment.priority.lower() }}">{{ assignment.priority }}</span>
+                                <h4>{{ assignment.title }}</h4>
+                                <p>{{ assignment.subject }}</p>
+                            </div>
+                            <div class="item-actions">
+                                <a href="{{ url_for('toggle_assignment', id=assignment.id) }}" class="btn-icon" title="Mark Complete">✓</a>
+                                <a href="{{ url_for('edit_assignment', id=assignment.id) }}" class="btn-icon" title="Edit">✏️</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-state">🎉 No tasks due today! Keep up the great work.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Today's Goals Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h3>🎯 Today's Daily Goals</h3>
+                <a href="{{ url_for('add_habit') }}" class="btn btn-small">+ Add</a>
+            </div>
+            <div class="section-content">
+                {% if habits %}
+                    {% for habit in habits %}
+                        <div class="list-item habit-item {% if habit.is_completed_today %}completed{% endif %}">
+                            <div class="item-content">
+                                <div class="habit-checkbox">
+                                    <input type="checkbox" 
+                                           {% if habit.is_completed_today %}checked{% endif %}
+                                           onchange="window.location.href='{{ url_for('toggle_habit', id=habit.id) }}'">
+                                </div>
+                                <div>
+                                    <h4>{{ habit.habit_name }}</h4>
+                                    <p>
+                                        <span class="category-badge">{{ habit.category }}</span>
+                                        <span class="streak-badge">🔥 {{ habit.current_streak }} day streak</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-state">🎯 No daily goals yet. Start building good habits today!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Streaks Visualization -->
+    <div class="chart-container full-width">
+        <div class="chart-header">
+            <h3>🔥 Goal Streak Progress</h3>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="streaksChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Upcoming Tasks -->
+    <div class="dashboard-section full-width">
+        <div class="section-header">
+            <h3>📋 Upcoming Tasks</h3>
+            <a href="{{ url_for('assignments') }}" class="btn btn-small">View All</a>
+        </div>
+        <div class="section-content">
+            {% if pending_assignments %}
+                <div class="assignment-list">
+                    {% for assignment in pending_assignments[:5] %}
+                        <div class="assignment-card">
+                            <div class="assignment-header">
+                                <h4>{{ assignment.title }}</h4>
+                                <span class="priority-badge priority-{{ assignment.priority.lower() }}">{{ assignment.priority }}</span>
+                            </div>
+                            <div class="assignment-meta">
+                                <span>📚 {{ assignment.subject }}</span>
+                                <span>📅 Due: {{ assignment.due_date.strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div class="assignment-actions">
+                                <a href="{{ url_for('toggle_assignment', id=assignment.id) }}" class="btn btn-secondary btn-small">Mark Complete</a>
+                                <a href="{{ url_for('edit_assignment', id=assignment.id) }}" class="btn btn-outline btn-small">Edit</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">🎊 All caught up! No pending tasks.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+// Prepare data for charts
+const taskData = {
+    pending: {{ pending_assignments|length }},
+    completed: {{ assignments|length - pending_assignments|length }},
+    total: {{ assignments|length }}
+};
+
+const priorityData = {
+    low: {{ assignments|selectattr('priority', 'equalto', 'Low')|list|length }},
+    medium: {{ assignments|selectattr('priority', 'equalto', 'Medium')|list|length }},
+    high: {{ assignments|selectattr('priority', 'equalto', 'High')|list|length }}
+};
+
+const habitNames = [
+    {% for habit in habits %}
+        "{{ habit.habit_name[:20] }}{% if habit.habit_name|length > 20 %}...{% endif %}",
+    {% endfor %}
+];
+
+const habitStreaks = [
+    {% for habit in habits %}
+        {{ habit.current_streak }},
+    {% endfor %}
+];
+
+// Chart colors - soft pastels
+const colors = {
+    primary: '#8B7AB8',
+    success: '#7EBDA6',
+    warning: '#E8B18F',
+    danger: '#E89A9A',
+    secondary: '#9BB5D4'
+};
+
+// Task Progress Chart (Doughnut)
+const taskProgressCtx = document.getElementById('taskProgressChart');
+if (taskProgressCtx) {
+    new Chart(taskProgressCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Pending'],
+            datasets: [{
+                data: [taskData.total - taskData.pending, taskData.pending],
+                backgroundColor: [colors.success, colors.warning],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 14,
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return label + ': ' + value + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Priority Distribution Chart (Bar)
+const priorityCtx = document.getElementById('priorityChart');
+if (priorityCtx) {
+    new Chart(priorityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Low', 'Medium', 'High'],
+            datasets: [{
+                label: 'Tasks',
+                data: [priorityData.low, priorityData.medium, priorityData.high],
+                backgroundColor: [colors.success, colors.warning, colors.danger],
+                borderRadius: 8,
+                barThickness: 50
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    },
+                    grid: {
+                        color: '#E1E8ED'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            family: "'Inter', sans-serif",
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Streaks Chart (Horizontal Bar)
+const streaksCtx = document.getElementById('streaksChart');
+if (streaksCtx && habitNames.length > 0) {
+    new Chart(streaksCtx, {
+        type: 'bar',
+        data: {
+            labels: habitNames,
+            datasets: [{
+                label: 'Current Streak (days)',
+                data: habitStreaks,
+                backgroundColor: colors.primary,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    },
+                    grid: {
+                        color: '#E1E8ED'
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+
+<style>
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.chart-container.full-width {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

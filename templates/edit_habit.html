@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Habit - MyDailyFlow{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header">
+        <h2>✏️ Edit Daily Goal</h2>
+        <p>Update goal details</p>
+    </div>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('edit_habit', id=habit.id) }}" class="modern-form">
+            <div class="form-group">
+                <label for="habit_name">Goal Name *</label>
+                <input type="text" 
+                       id="habit_name" 
+                       name="habit_name" 
+                       value="{{ habit.habit_name }}"
+                       required 
+                       class="form-input">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required class="form-select">
+                        <option value="Study" {% if habit.category == 'Study' %}selected{% endif %}>📚 Study</option>
+                        <option value="Health" {% if habit.category == 'Health' %}selected{% endif %}>💪 Health</option>
+                        <option value="Productivity" {% if habit.category == 'Productivity' %}selected{% endif %}>⚡ Productivity</option>
+                        <option value="Social" {% if habit.category == 'Social' %}selected{% endif %}>👥 Social</option>
+                        <option value="Self-Care" {% if habit.category == 'Self-Care' %}selected{% endif %}>🧘 Self-Care</option>
+                        <option value="Other" {% if habit.category == 'Other' %}selected{% endif %}>📌 Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="target_frequency">Target Frequency *</label>
+                    <select id="target_frequency" name="target_frequency" required class="form-select">
+                        <option value="Daily" {% if habit.target_frequency == 'Daily' %}selected{% endif %}>Daily</option>
+                        <option value="Weekly" {% if habit.target_frequency == 'Weekly' %}selected{% endif %}>Weekly</option>
+                        <option value="3x per week" {% if habit.target_frequency == '3x per week' %}selected{% endif %}>3x per week</option>
+                        <option value="5x per week" {% if habit.target_frequency == '5x per week' %}selected{% endif %}>5x per week</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="habit-progress-box">
+                <h4>📊 Progress Summary</h4>
+                <div class="progress-stats">
+                    <div class="progress-item">
+                        <span class="progress-label">Current Streak:</span>
+                        <span class="progress-value">🔥 {{ habit.current_streak }} days</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-label">Longest Streak:</span>
+                        <span class="progress-value">🏆 {{ habit.longest_streak }} days</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-label">Created:</span>
+                        <span class="progress-value">{{ habit.created_at.strftime('%b %d, %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✓ Update Goal</button>
+                <a href="{{ url_for('habits') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('delete_habit', id=habit.id) }}" 
+                   class="btn btn-danger"
+                   onclick="return confirm('Are you sure you want to delete this goal? All progress will be lost.')">🗑️ Delete</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyDailyFlow{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>🌊 MyDailyFlow</h1>
+                <p class="tagline">Tasks & Goals, Organized Daily</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="{{ url_for('assignments') }}" class="{% if request.endpoint in ['assignments', 'add_assignment', 'edit_assignment'] %}active{% endif %}">Tasks</a></li>
+                <li><a href="{{ url_for('habits') }}" class="{% if request.endpoint in ['habits', 'add_habit', 'edit_habit'] %}active{% endif %}">Daily Goals</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                        <button class="close-flash" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 MyDailyFlow - Student Productivity Hub | Built with Flask</p>
+    </footer>
+
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(msg) {
+                msg.style.opacity = '0';
+                setTimeout(function() {
+                    msg.remove();
+                }, 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

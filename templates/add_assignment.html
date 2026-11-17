@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+
+{% block title %}Add Task - MyDailyFlow{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header-form">
+        <div>
+            <h2>📝 Create New Task</h2>
+            <p>Add a task, assignment, or study schedule</p>
+        </div>
+    </div>
+
+    <div class="form-container-wide">
+        <form method="POST" action="{{ url_for('add_assignment') }}" class="modern-form-enhanced">
+            
+            <!-- Task Type Selection -->
+            <div class="form-section">
+                <h3 class="section-title">📋 Task Type</h3>
+                <div class="task-type-selector">
+                    <label class="type-card">
+                        <input type="radio" name="task_type" value="Assignment" checked>
+                        <div class="type-card-content">
+                            <span class="type-icon">📚</span>
+                            <span class="type-name">Assignment</span>
+                            <span class="type-desc">Homework, coursework</span>
+                        </div>
+                    </label>
+                    
+                    <label class="type-card">
+                        <input type="radio" name="task_type" value="Study Schedule">
+                        <div class="type-card-content">
+                            <span class="type-icon">📖</span>
+                            <span class="type-name">Study Schedule</span>
+                            <span class="type-desc">Classes, study sessions</span>
+                        </div>
+                    </label>
+                    
+                    <label class="type-card">
+                        <input type="radio" name="task_type" value="Project">
+                        <div class="type-card-content">
+                            <span class="type-icon">🎯</span>
+                            <span class="type-name">Project</span>
+                            <span class="type-desc">Large assignments</span>
+                        </div>
+                    </label>
+                    
+                    <label class="type-card">
+                        <input type="radio" name="task_type" value="Personal">
+                        <div class="type-card-content">
+                            <span class="type-icon">⭐</span>
+                            <span class="type-name">Personal Task</span>
+                            <span class="type-desc">Other activities</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h3 class="section-title">📝 Basic Information</h3>
+                <div class="form-grid">
+                    <div class="form-group-enhanced">
+                        <label for="title">
+                            <span class="label-text">Task Title</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="text" 
+                               id="title" 
+                               name="title" 
+                               required 
+                               placeholder="e.g., Complete Chapter 5 exercises"
+                               class="form-input-enhanced">
+                    </div>
+
+                    <div class="form-group-enhanced">
+                        <label for="subject">
+                            <span class="label-text">Subject/Category</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <select id="subject" name="subject" required class="form-select-enhanced">
+                            <option value="">Select subject...</option>
+                            <optgroup label="📚 Academic">
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Physics">Physics</option>
+                                <option value="Chemistry">Chemistry</option>
+                                <option value="Biology">Biology</option>
+                                <option value="English">English</option>
+                                <option value="History">History</option>
+                                <option value="Economics">Economics</option>
+                                <option value="Business">Business</option>
+                            </optgroup>
+                            <optgroup label="⭐ Personal">
+                                <option value="Health & Fitness">Health & Fitness</option>
+                                <option value="Hobbies">Hobbies</option>
+                                <option value="Social">Social</option>
+                                <option value="Other">Other</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date & Priority -->
+            <div class="form-section">
+                <h3 class="section-title">📅 Schedule & Priority</h3>
+                <div class="form-grid-three">
+                    <div class="form-group-enhanced">
+                        <label for="due_date">
+                            <span class="label-text">Due Date</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="date" 
+                               id="due_date" 
+                               name="due_date" 
+                               required 
+                               class="form-input-enhanced">
+                        <small class="form-hint">📆 Select any date</small>
+                    </div>
+
+                    <div class="form-group-enhanced">
+                        <label>
+                            <span class="label-text">Priority Level</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="priority-selector">
+                            <label class="priority-option priority-option-low">
+                                <input type="radio" name="priority" value="Low" required>
+                                <span class="priority-label">
+                                    <span class="priority-dot"></span>
+                                    Low
+                                </span>
+                            </label>
+                            <label class="priority-option priority-option-medium">
+                                <input type="radio" name="priority" value="Medium" checked required>
+                                <span class="priority-label">
+                                    <span class="priority-dot"></span>
+                                    Medium
+                                </span>
+                            </label>
+                            <label class="priority-option priority-option-high">
+                                <input type="radio" name="priority" value="High" required>
+                                <span class="priority-label">
+                                    <span class="priority-dot"></span>
+                                    High
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Details -->
+            <div class="form-section">
+                <h3 class="section-title">📄 Additional Details</h3>
+                <div class="form-group-enhanced">
+                    <label for="description">
+                        <span class="label-text">Description</span>
+                        <span class="label-optional">(Optional)</span>
+                    </label>
+                    <textarea id="description" 
+                              name="description" 
+                              rows="5" 
+                              placeholder="Add notes, requirements, or any additional details about this task..."
+                              class="form-textarea-enhanced"></textarea>
+                    <small class="form-hint">💡 Include links, notes, or instructions</small>
+                </div>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="form-tips">
+                <div class="tip-icon">💡</div>
+                <div class="tip-content">
+                    <strong>Quick Tips:</strong>
+                    <ul>
+                        <li>Be specific with task titles for better organization</li>
+                        <li>Use priority levels to focus on what's important</li>
+                        <li>Add descriptions to remember context later</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions-enhanced">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span>✓</span>
+                    Create Task
+                </button>
+                <a href="{{ url_for('assignments') }}" class="btn btn-secondary btn-large">
+                    <span>✕</span>
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Enhanced Form Styling */
+.form-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header-form {
+    margin-bottom: 2.5rem;
+}
+
+.page-header-form h2 {
+    font-size: 2.5rem;
+    background: var(--gradient-neon);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.page-header-form p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+}
+
+.form-container-wide {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    padding: 3rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modern-form-enhanced {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* Form Sections */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Task Type Selector */
+.task-type-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.type-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.type-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.type-card-content {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+}
+
+.type-card input:checked + .type-card-content {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.type-card:hover .type-card-content {
+    transform: translateY(-5px);
+    border-color: var(--neon-blue);
+}
+
+.type-icon {
+    font-size: 2.5rem;
+    display: block;
+}
+
+.type-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.type-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-grid-three {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Enhanced Form Groups */
+.form-group-enhanced {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-group-enhanced label {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.label-text {
+    flex: 1;
+}
+
+.label-required {
+    color: #ef4444;
+    font-size: 1.125rem;
+}
+
+.label-optional {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.form-input-enhanced,
+.form-select-enhanced,
+.form-textarea-enhanced {
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+}
+
+.form-input-enhanced:focus,
+.form-select-enhanced:focus,
+.form-textarea-enhanced:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.form-hint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Priority Selector */
+.priority-selector {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.priority-option {
+    flex: 1;
+    min-width: 120px;
+    cursor: pointer;
+    position: relative;
+}
+
+.priority-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.priority-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.3s;
+    font-weight: 700;
+    justify-content: center;
+}
+
+.priority-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+}
+
+.priority-option-low .priority-dot {
+    background: #10b981;
+}
+
+.priority-option-medium .priority-dot {
+    background: #f59e0b;
+}
+
+.priority-option-high .priority-dot {
+    background: #ef4444;
+}
+
+.priority-option input:checked + .priority-label {
+    border-color: currentColor;
+    transform: scale(1.05);
+}
+
+.priority-option-low input:checked + .priority-label {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.priority-option-medium input:checked + .priority-label {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.priority-option-high input:checked + .priority-label {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+/* Tips Box */
+.form-tips {
+    background: rgba(0, 212, 255, 0.05);
+    border-left: 4px solid var(--neon-blue);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    gap: 1.25rem;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.tip-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.tip-content {
+    flex: 1;
+}
+
+.tip-content strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 1.0625rem;
+}
+
+.tip-content ul {
+    margin-left: 1.25rem;
+    color: var(--text-secondary);
+}
+
+.tip-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Enhanced Actions */
+.form-actions-enhanced {
+    display: flex;
+    gap: 1.25rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--glass-border);
+}
+
+.btn-large {
+    padding: 1.125rem 2.5rem;
+    font-size: 1.0625rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.btn-large span {
+    font-size: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-container-wide {
+        padding: 2rem 1.5rem;
+    }
+    
+    .task-type-selector {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .form-grid,
+    .form-grid-three {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions-enhanced {
+        flex-direction: column;
+    }
+    
+    .btn-large {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+// Set minimum date to today
+document.getElementById('due_date').min = new Date().toISOString().split('T')[0];
+
+// Set default date to tomorrow
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+document.getElementById('due_date').value = tomorrow.toISOString().split('T')[0];
+</script>
+{% endblock %}

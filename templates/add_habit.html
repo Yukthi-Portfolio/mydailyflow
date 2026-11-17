@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Add Daily Goal - MyDailyFlow{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header">
+        <div>
+            <h2>🎯 Add New Daily Goal</h2>
+            <p>Create a new goal to track daily</p>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('add_habit') }}" class="modern-form">
+            <div class="form-group">
+                <label for="habit_name">Goal Name *</label>
+                <input type="text" 
+                       id="habit_name" 
+                       name="habit_name" 
+                       required 
+                       placeholder="e.g., Exercise for 30 minutes daily"
+                       class="form-input">
+                <small class="form-hint">Be specific and actionable</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required class="form-select">
+                        <option value="">Select a category</option>
+                        <option value="Study">📚 Study</option>
+                        <option value="Health">💪 Health</option>
+                        <option value="Productivity">⚡ Productivity</option>
+                        <option value="Social">👥 Social</option>
+                        <option value="Self-Care">🧘 Self-Care</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="target_frequency">Target Frequency *</label>
+                    <select id="target_frequency" name="target_frequency" required class="form-select">
+                        <option value="Daily" selected>Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="3x per week">3x per week</option>
+                        <option value="5x per week">5x per week</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="habit-examples">
+                <h4>💡 Goal Examples:</h4>
+                <ul>
+                    <li><strong>Study:</strong> Review lecture notes for 30 minutes</li>
+                    <li><strong>Health:</strong> Exercise for 30 minutes</li>
+                    <li><strong>Productivity:</strong> Plan tomorrow before bed</li>
+                    <li><strong>Self-Care:</strong> Get 7-8 hours of sleep</li>
+                </ul>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✓ Add Goal</button>
+                <a href="{{ url_for('habits') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
